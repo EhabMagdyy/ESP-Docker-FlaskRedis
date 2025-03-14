@@ -1,0 +1,27 @@
+services:
+  web:
+    build: .                      # Uses the Dockerfile in the current directory
+    command: python app.py        # Container runs 'python app.py' as the main process
+    ports:
+      - target: 5000
+        published: 5000           # Maps container's port 5000 to host's port 5000
+    networks:
+      frontend-net:               # Attaches the web container to the 'frontend-net'
+      backend-net:                # Also attaches the web container to the 'backend-net'
+    volumes:
+      - type: volume
+        source: counter-vol       # The Docker volume name (defined below)
+        target: /code             # Mounts the volume at /code inside the container
+
+  redis:
+    image: "redis:alpine"         # Uses the official Redis Alpine-based image
+    networks:
+      backend-net:                # Redis is attached only to the 'backend-net'
+
+networks:
+  frontend-net:                   # A user-facing network
+  backend-net:
+    internal: true                # This internal network isn't exposed to external hosts
+
+volumes:
+  counter-vol:                    # Named Docker volume to persist or share data
